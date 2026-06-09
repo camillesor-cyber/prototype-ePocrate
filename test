@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ePocrate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--navy:#0B1D3A;--navy2:#132B52;--navy3:#1A3A6B;
+--teal:#2A9D8F;--teal-l:#40B5A6;--teal-p:#E8F5F3;--teal-d:#1E7A6E;
+--gold:#E9C46A;--gold-p:#FFF8E7;
+--coral:#E76F51;--coral-p:#FEF0EC;
+--g50:#F7F8FA;--g100:#ECEEF2;--g200:#D5D9E2;--g300:#B4BBCA;--g400:#8D96A8;--g500:#6B7589;--g600:#4A5468;--g800:#2D3344;
+--white:#FFFFFF;--radius:14px;--radius-lg:20px;--radius-sm:10px;
+--shadow-sm:0 1px 3px rgba(11,29,58,0.06);--shadow:0 2px 12px rgba(11,29,58,0.08);--shadow-lg:0 8px 30px rgba(11,29,58,0.12);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:var(--g50);color:var(--g800);overflow-x:hidden}
+button{font-family:inherit;cursor:pointer;border:none}
+input[type="range"]{-webkit-appearance:none;height:6px;border-radius:3px;background:var(--g200);width:100%;outline:none;cursor:pointer}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--teal);border:3px solid var(--white);box-shadow:var(--shadow);cursor:pointer}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--g200);border-radius:3px}
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+@keyframes dotPulse{0%,100%{opacity:0.3}50%{opacity:1}}
+
+/* WELCOME SCREEN */
+.welcome{position:fixed;inset:0;background:var(--white);z-index:300;display:flex;align-items:center;justify-content:center;flex-direction:column;transition:opacity 0.5s,transform 0.5s}
+.welcome.gone{opacity:0;transform:scale(1.05);pointer-events:none}
+.welcome-inner{text-align:center;animation:scaleIn 0.6s ease;max-width:440px;padding:40px}
+.welcome-logo{width:100px;height:auto;margin-bottom:24px}
+.welcome h1{font-size:28px;font-weight:700;color:var(--navy);margin-bottom:8px;letter-spacing:-0.5px}
+.welcome p{font-size:16px;color:var(--g500);line-height:1.6;margin-bottom:32px;font-weight:300}
+.welcome .btn-start{background:var(--teal);color:var(--white);padding:16px 40px;border-radius:12px;font-size:16px;font-weight:600;transition:all 0.25s;box-shadow:0 4px 16px rgba(42,157,143,0.3)}
+.welcome .btn-start:hover{background:var(--teal-d);transform:translateY(-2px);box-shadow:0 6px 24px rgba(42,157,143,0.4)}
+
+/* ONBOARDING */
+.onboarding{position:fixed;inset:0;background:rgba(11,29,58,0.5);backdrop-filter:blur(12px);z-index:250;display:flex;align-items:center;justify-content:center}
+.onboarding.hidden{display:none}
+.ob-card{background:var(--white);border-radius:var(--radius-lg);padding:44px 48px;max-width:520px;width:92%;box-shadow:var(--shadow-lg);animation:scaleIn 0.35s ease}
+.ob-icon{font-size:44px;margin-bottom:16px}
+.ob-title{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.ob-sub{font-size:15px;color:var(--g500);line-height:1.6;margin-bottom:28px;font-weight:300}
+.ob-choices{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:28px}
+.ob-choice{padding:10px 18px;border-radius:var(--radius-sm);border:2px solid var(--g200);background:var(--white);color:var(--g600);font-size:13px;font-weight:600;transition:all 0.2s}
+.ob-choice.selected{border-color:var(--teal);background:var(--teal-p);color:var(--teal)}
+.ob-choice:hover:not(.selected){border-color:var(--g300)}
+.ob-actions{display:flex;gap:12px;justify-content:center}
+.ob-dots{display:flex;gap:6px;justify-content:center;margin-top:24px}
+.ob-dot{width:8px;height:8px;border-radius:4px;background:var(--g200);transition:all 0.3s}
+.ob-dot.active{width:24px;background:var(--teal)}
+
+/* SIDEBAR */
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:250px;background:var(--navy);display:flex;flex-direction:column;z-index:100}
+.sb-logo{padding:24px 20px 4px;display:flex;align-items:center;gap:10px}
+.sb-logo img{width:32px;height:auto}
+.sb-logo span{font-size:18px;font-weight:700;color:var(--white);letter-spacing:-0.3px}
+.sb-sub{font-size:11px;color:var(--g400);padding:0 20px 20px;font-weight:300}
+.sb-nav{flex:1;padding:4px 10px;display:flex;flex-direction:column;gap:2px}
+.nav-btn{display:flex;align-items:center;gap:11px;padding:11px 14px;border-radius:var(--radius-sm);background:transparent;color:rgba(255,255,255,0.5);font-size:13.5px;font-weight:400;width:100%;text-align:left;transition:all 0.2s}
+.nav-btn.active{background:rgba(42,157,143,0.15);color:var(--teal-l);font-weight:600}
+.nav-btn:hover:not(.active){background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.7)}
+.nav-icon{width:18px;text-align:center;font-size:15px}
+.sb-profile{padding:14px 16px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:10px}
+.avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--gold));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--white);flex-shrink:0}
+.sb-profile .name{font-size:12.5px;font-weight:600;color:var(--white)}
+.sb-profile .sub{font-size:11px;color:var(--g400);font-weight:300}
+
+/* MAIN */
+.main{margin-left:250px;padding:0 36px 48px;min-height:100vh}
+.topbar{padding:22px 0 16px;display:flex;justify-content:space-between;align-items:center}
+.tb-title{font-size:24px;font-weight:700;color:var(--navy);letter-spacing:-0.5px}
+.tb-sub{font-size:13.5px;color:var(--g400);margin-top:3px;font-weight:300}
+.tb-actions{display:flex;gap:10px}
+.tb-btn{padding:8px 14px;border-radius:var(--radius-sm);background:var(--white);color:var(--g500);font-size:13px;font-weight:500;box-shadow:var(--shadow-sm);border:1px solid var(--g100);position:relative;transition:all 0.2s}
+.tb-btn:hover{box-shadow:var(--shadow)}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--coral);position:absolute;top:6px;right:6px}
+
+/* CARDS */
+.card{background:var(--white);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);border:1px solid var(--g100);transition:all 0.25s}
+.card:hover{box-shadow:var(--shadow)}
+.card-dark{background:linear-gradient(135deg,var(--navy),var(--navy2));color:var(--white);border:none}
+.card-dark:hover{box-shadow:var(--shadow-lg)}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat{background:var(--white);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm);border:1px solid var(--g100);position:relative;overflow:hidden;transition:all 0.25s}
+.stat:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.stat-bar{position:absolute;top:0;left:0;right:0;height:3px}
+.stat-label{font-size:11.5px;color:var(--g400);font-weight:500;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px}
+.stat-val{font-size:26px;font-weight:700;color:var(--navy);letter-spacing:-1px}
+.stat-delta{font-size:11.5px;font-weight:600;margin-top:5px;display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:5px}
+.delta-up{color:var(--teal);background:var(--teal-p)}
+.delta-warn{color:var(--coral);background:var(--coral-p)}
+
+/* GRID */
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.sec-title{font-size:16px;font-weight:700;color:var(--navy);margin-bottom:14px}
+
+/* PROGRESS */
+.prog{height:7px;border-radius:4px;background:var(--g100);position:relative;overflow:hidden}
+.prog-fill{position:absolute;top:0;left:0;height:100%;border-radius:4px;transition:width 0.8s ease}
+.fill-teal{background:var(--teal)}.fill-gold{background:var(--gold)}.fill-grad{background:linear-gradient(90deg,var(--teal),var(--teal-l))}
+.prog-dark{background:rgba(255,255,255,0.12)}
+
+/* BADGE */
+.badge{display:inline-flex;padding:3px 9px;border-radius:5px;font-size:11px;font-weight:600}
+.b-teal{background:var(--teal-p);color:var(--teal)}.b-gold{background:var(--gold-p);color:#B8860B}.b-coral{background:var(--coral-p);color:var(--coral)}.b-gray{background:var(--g100);color:var(--g500)}
+
+/* BUTTONS */
+.btn{padding:11px 22px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:600;transition:all 0.2s;display:inline-flex;align-items:center;gap:7px}
+.btn-sm{padding:7px 14px;font-size:12.5px}
+.btn-p{background:var(--teal);color:var(--white)}.btn-p:hover{background:var(--teal-d);transform:translateY(-1px)}
+.btn-s{background:var(--g100);color:var(--g600)}.btn-s:hover{background:var(--g200)}
+.btn-g{background:transparent;color:var(--teal)}.btn-g:hover{background:var(--teal-p)}
+.btn-full{width:100%;justify-content:center}
+
+/* MODULE */
+.mod{border-radius:var(--radius);padding:18px;border:1px solid var(--g100);box-shadow:var(--shadow-sm);background:var(--white);margin-bottom:10px;cursor:pointer;transition:all 0.2s}
+.mod:hover:not(.locked){box-shadow:var(--shadow);transform:translateY(-1px)}
+.mod.locked{background:var(--g50);border-color:var(--g200);opacity:0.65;cursor:default}
+.mod-head{display:flex;align-items:center;gap:14px}
+.mod-ico{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.mod-detail{display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--g100);animation:fadeIn 0.3s ease}
+.mod-detail.open{display:block}
+.mod-lessons{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mod-lesson{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--radius-sm);background:var(--g50);font-size:12.5px;color:var(--g500)}
+.mod-lesson.done{color:var(--teal)}
+
+/* CHECK */
+.chk{display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:1px solid var(--g100);cursor:pointer;font-size:13.5px;transition:all 0.15s}
+.chk.done{color:var(--g400);text-decoration:line-through}
+.chk-circle{width:21px;height:21px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;color:var(--white);font-size:11px;flex-shrink:0;transition:all 0.2s}
+.chk-circle.done{border-color:var(--teal);background:var(--teal)}
+
+/* COMMUNITY */
+.post{margin-bottom:14px}.post:last-child{margin-bottom:0}
+.post-head{display:flex;gap:12px;margin-bottom:10px}
+.post-meta{display:flex;gap:14px;font-size:12.5px;color:var(--g400);margin-top:8px}
+.post-meta button{background:none;border:none;color:var(--teal);font-size:12.5px;font-weight:500;cursor:pointer;padding:0}
+
+/* SIM */
+.sim-label{font-size:12.5px;font-weight:600;color:var(--g500);margin-bottom:5px;display:block}
+.sim-result{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:var(--radius);padding:22px;color:var(--white);margin-top:18px}
+.sim-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sim-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.sim-tip{margin-top:18px;padding:13px;border-radius:var(--radius-sm);background:var(--teal-p);font-size:12.5px;color:var(--teal);line-height:1.5}
+.tog{display:flex;gap:8px;margin-bottom:18px}
+.tog-btn{flex:1;padding:11px;border-radius:var(--radius-sm);border:2px solid var(--g200);background:var(--white);color:var(--g500);font-size:13px;font-weight:600;transition:all 0.2s}
+.tog-btn.on{border-color:var(--teal);background:var(--teal-p);color:var(--teal)}
+
+/* PILLS */
+.pills{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.pill{padding:7px 16px;border-radius:8px;border:1px solid var(--g200);background:var(--white);color:var(--g500);font-size:12.5px;font-weight:600;transition:all 0.15s}
+.pill.on{border-color:var(--teal);background:var(--teal-p);color:var(--teal)}
+
+/* RESOURCE */
+.res{position:relative;cursor:pointer}
+.res .badge{position:absolute;top:14px;right:14px}
+
+/* ANIM */
+.page{animation:fadeIn 0.35s ease}
+
+/* COMMUNITY ITEM */
+.c-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--g100)}
+.c-item:last-child{border-bottom:none}
+
+/* ACTION */
+.act{display:flex;gap:9px;align-items:flex-start;padding:9px 11px;border-radius:var(--radius-sm);margin-bottom:7px}
+.act.urgent{background:var(--coral-p)}.act:not(.urgent){background:var(--g50)}
+</style>
+</head>
+<body>
+
+<!-- WELCOME -->
+<div class="welcome" id="welcome">
+  <div class="welcome-inner">
+    <img src="https://i.ibb.co/fVZsmpHQ/logo-epocrate.png" alt="ePocrate" class="welcome-logo" onerror="this.style.display='none'">
+    <h1>Bienvenue sur ePocrate</h1>
+    <p>Vous soignez vos patients.<br>On vous aide à piloter votre cabinet.</p>
+    <button class="btn-start" onclick="closeWelcome()">Commencer</button>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div class="onboarding hidden" id="onboarding">
+  <div class="ob-card" id="ob-card"></div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div style="width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--teal),var(--teal-l));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white">e</div>
+    <span>ePocrate</span>
+  </div>
+  <div class="sb-sub">Votre copilote entrepreneurial</div>
+  <nav class="sb-nav" id="nav"></nav>
+  <div class="sb-profile">
+    <div class="avatar">GL</div>
+    <div><div class="name">Dr. Guillaume L.</div><div class="sub">Chirurgien · En installation</div></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div id="tb-text"></div>
+    <div class="tb-actions">
+      <button class="tb-btn" style="position:relative">🔔<div class="notif-dot"></div></button>
+      <button class="tb-btn">⚙️</button>
+    </div>
+  </div>
+  <div id="page" class="page"></div>
+</div>
+
+<script>
+let page='dashboard',checks=[1,1,1,0,0,0,0,0,0,0,0,0],expMod=2,simR=90000,simS='EI',simSec='1',obStep=0,obSel=[[],[]];
+
+const NAV=[{id:'dashboard',ic:'📊',l:'Tableau de bord'},{id:'parcours',ic:'🎓',l:'Mon parcours'},{id:'simulateur',ic:'🧮',l:'Simulateur fiscal'},{id:'checklist',ic:'✅',l:"Checklist installation"},{id:'communaute',ic:'👥',l:'Communauté'},{id:'ressources',ic:'📚',l:'Ressources'}];
+const TITLES={dashboard:['Bonjour Guillaume 👋','Votre progression cette semaine'],parcours:['Mon parcours','Formations adaptées à votre profil'],simulateur:['Simulateur fiscal','Estimez vos charges et revenus'],checklist:["Checklist d'installation",'Suivez vos démarches'],communaute:['Communauté','Échangez entre confrères'],ressources:['Ressources','Guides et outils pratiques']};
+const MODS=[
+  {id:1,t:"Choisir son statut juridique",d:"SELARL, SCM, EI... impacts fiscaux de chaque option",dur:"45 min",p:100,b:"teal",bt:"Terminé",ic:"⚖️"},
+  {id:2,t:"Piloter sa trésorerie",d:"Anticiper les décalages URSSAF, provisionner, lire un TDB",dur:"60 min",p:65,b:"gold",bt:"En cours",ic:"💰"},
+  {id:3,t:"Comprendre ses cotisations",d:"URSSAF, CARMF, CPAM : décryptage et optimisation",dur:"50 min",p:20,b:"gold",bt:"En cours",ic:"🏛️"},
+  {id:4,t:"Recruter et manager",d:"Secrétaire, remplaçants, cadre légal",dur:"40 min",p:0,b:"gray",bt:"À venir",ic:"👤",locked:1},
+  {id:5,t:"Développer sa patientèle",d:"Adressage, Doctolib, fidélisation",dur:"35 min",p:0,b:"gray",bt:"À venir",ic:"📈",locked:1},
+  {id:6,t:"Vision long terme",d:"Business plan, investissements, projection 5 ans",dur:"55 min",p:0,b:"gray",bt:"À venir",ic:"🔭",locked:1},
+];
+const CHL=[
+  {t:"Inscription au Conseil de l'Ordre",c:"Administratif"},{t:"Déclaration URSSAF (P0PL)",c:"Administratif"},{t:"Affiliation CARMF",c:"Social"},
+  {t:"Choix de l'option conventionnelle",c:"Convention"},{t:"Souscription RCP",c:"Assurance"},{t:"Choix du statut juridique",c:"Juridique"},
+  {t:"Ouverture compte bancaire pro",c:"Financier"},{t:"Sélection expert-comptable",c:"Financier"},{t:"Logiciel métier (SEGUR)",c:"Logiciel"},
+  {t:"Profil Doctolib / Maiia",c:"Patientèle"},{t:"Conformité RGPD",c:"Légal"},{t:"Accessibilité PMR du local",c:"Local"},
+];
+const POSTS=[
+  {a:"Dr. Marie L.",r:"Généraliste, Lozère",t:"Il y a 2h",txt:"Quelqu'un a un retour sur le passage de EI à SELARL après 3 ans ? Mon comptable me le conseille mais j'aimerais des retours concrets.",rp:7,lk:12,ini:"M"},
+  {a:"Dr. Thomas R.",r:"Dermatologue, Lyon",t:"Il y a 5h",txt:"Astuce : j'ai négocié mon bail en intégrant une clause de sortie à 3 ans. Ça m'a enlevé un stress énorme au démarrage.",rp:14,lk:28,ini:"T"},
+  {a:"Dr. Sophie M.",r:"Pédiatre, Ariège",t:"Hier",txt:"Premier trimestre en zone sous-dotée : l'aide ARS a couvert 60% de mon installation. Le plus dur reste la gestion quotidienne.",rp:9,lk:19,ini:"S"},
+];
+const RES=[
+  {t:"Guide : URSSAF décrypté",ty:"PDF",ic:"📄",tag:"Populaire",tc:"coral"},
+  {t:"Business plan cabinet médical",ty:"Excel",ic:"📊",tag:"Nouveau",tc:"teal"},
+  {t:"Comprendre la CARMF en 15 min",ty:"Vidéo",ic:"🎥",tag:"",tc:""},
+  {t:"Conformité RGPD cabinet",ty:"PDF",ic:"📄",tag:"",tc:""},
+  {t:"Comparatif SELARL vs EI",ty:"Outil",ic:"🧮",tag:"Populaire",tc:"coral"},
+  {t:"Optimiser ses charges en 2026",ty:"Vidéo",ic:"🎥",tag:"Nouveau",tc:"teal"},
+];
+
+// WELCOME
+function closeWelcome(){
+  document.getElementById('welcome').classList.add('gone');
+  setTimeout(()=>{document.getElementById('welcome').style.display='none';document.getElementById('onboarding').classList.remove('hidden');renderOb()},500);
+}
+
+// ONBOARDING
+const OBS=[
+  {t:"Quel est votre profil ?",s:"Nous adaptons votre parcours en fonction de votre situation.",ic:"🎯",cta:"Continuer",ch:["Étudiant / Interne","En cours d'installation","Reconversion public → privé","Déjà installé(e)"]},
+  {t:"Vos priorités ?",s:"Quels sujets vous préoccupent le plus ?",ic:"📋",cta:"Accéder à mon espace",ch:["Fiscalité et cotisations","Statut juridique","Trésorerie et finances","Management et RH","Développement patientèle","Vision stratégique"]},
+];
+function renderOb(){
+  const s=OBS[obStep],ci=obStep;
+  let h=`<div class="ob-icon">${s.ic}</div><div class="ob-title">${s.t}</div><p class="ob-sub">${s.s}</p><div class="ob-choices">`;
+  s.ch.forEach(c=>{const sel=obSel[ci].includes(c);h+=`<button class="ob-choice${sel?' selected':''}" onclick="togOb(${ci},'${c.replace(/'/g,"\\'")}')">${c}</button>`});
+  h+=`</div><div class="ob-actions">`;
+  if(obStep>0)h+=`<button class="btn btn-s" onclick="obStep--;renderOb()">Retour</button>`;
+  h+=`<button class="btn btn-p" style="padding:13px 30px" onclick="obNext()">${s.cta}</button></div>`;
+  h+=`<div class="ob-dots">${OBS.map((_,i)=>`<div class="ob-dot${i===obStep?' active':''}"></div>`).join('')}</div>`;
+  document.getElementById('ob-card').innerHTML=h;
+}
+function togOb(ci,c){const a=obSel[ci],i=a.indexOf(c);if(i>=0)a.splice(i,1);else a.push(c);renderOb()}
+function obNext(){if(obStep<OBS.length-1){obStep++;renderOb()}else document.getElementById('onboarding').classList.add('hidden')}
+
+// NAV
+function renderNav(){
+  document.getElementById('nav').innerHTML=NAV.map(n=>`<button class="nav-btn${page===n.id?' active':''}" onclick="go('${n.id}')"><span class="nav-icon">${n.ic}</span>${n.l}</button>`).join('');
+}
+function go(p){page=p;renderNav();renderTb();renderPage()}
+function renderTb(){const t=TITLES[page];document.getElementById('tb-text').innerHTML=`<div class="tb-title">${t[0]}</div><div class="tb-sub">${t[1]}</div>`}
+
+// PAGE ROUTER
+function renderPage(){
+  const el=document.getElementById('page');el.style.animation='none';el.offsetHeight;el.style.animation='fadeIn 0.35s ease';
+  switch(page){
+    case 'dashboard':el.innerHTML=pgDash();break;
+    case 'parcours':el.innerHTML=pgParcours();break;
+    case 'simulateur':el.innerHTML=pgSim();break;
+    case 'checklist':el.innerHTML=pgCheck();break;
+    case 'communaute':el.innerHTML=pgComm();break;
+    case 'ressources':el.innerHTML=pgRes();break;
+  }
+}
+
+// DASHBOARD
+function pgDash(){
+  const sts=[{l:"Préparation",v:"62%",d:"+8%",up:1,c:"var(--teal)"},{l:"Modules",v:"2/6",d:"+1 cette sem.",up:1,c:"var(--gold)"},{l:"Checklist",v:"25%",d:"3/12",up:1,c:"var(--coral)"},{l:"Temps investi",v:"4.5h",d:"+1.2h",up:1,c:"var(--navy)"}];
+  let h=`<div class="stats">${sts.map(s=>`<div class="stat"><div class="stat-bar" style="background:${s.c}"></div><div class="stat-label">${s.l}</div><div class="stat-val">${s.v}</div><div class="stat-delta ${s.up?'delta-up':'delta-warn'}">↑ ${s.d}</div></div>`).join('')}</div>`;
+  
+  h+=`<div class="g21"><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div class="sec-title" style="margin:0">Reprendre mon parcours</div><span class="badge b-gold">En cours</span></div>`;
+  h+=`<div style="display:flex;gap:14px;align-items:center;margin-bottom:14px"><div style="width:48px;height:48px;border-radius:11px;background:linear-gradient(135deg,var(--gold-p),#F4D98C);display:flex;align-items:center;justify-content:center;font-size:22px">💰</div><div><div style="font-weight:700;color:var(--navy);font-size:14.5px">Piloter sa trésorerie</div><div style="font-size:12.5px;color:var(--g400)">Module 2 · Leçon 4/6</div></div></div>`;
+  h+=`<div class="prog"><div class="prog-fill fill-gold" style="width:65%"></div></div><div style="display:flex;justify-content:space-between;margin-top:6px;font-size:12px;color:var(--g400)"><span>65%</span><span>~20 min</span></div>`;
+  h+=`<button class="btn btn-p btn-full" style="margin-top:14px">Continuer →</button></div>`;
+
+  h+=`<div class="card"><div class="sec-title" style="font-size:15px">Actions urgentes</div>`;
+  [{ic:"⚠️",t:"Option conventionnelle",u:"Critique",urg:1},{ic:"📋",t:"Compléter votre RCP",u:"Important",urg:0},{ic:"💡",t:"Webinaire fiscalité 2026",u:"Info",urg:0}].forEach(a=>{
+    h+=`<div class="act${a.urg?' urgent':''}"><span style="font-size:15px">${a.ic}</span><div><div style="font-size:12.5px;font-weight:600;color:var(--g800)">${a.t}</div><div style="font-size:11px;font-weight:600;color:${a.urg?'var(--coral)':'var(--g400)'}; margin-top:2px">${a.u}</div></div></div>`;
+  });
+  h+=`</div></div>`;
+
+  h+=`<div class="card"><div class="sec-title">Communauté</div>`;
+  POSTS.slice(0,2).forEach(p=>{
+    h+=`<div class="c-item"><div class="avatar">${p.ini}</div><div style="flex:1"><div style="font-size:12.5px;font-weight:600;color:var(--navy)">${p.a} <span style="font-weight:400;color:var(--g400)">· ${p.r}</span></div><div style="font-size:13px;color:var(--g500);margin-top:3px;line-height:1.5">${p.txt.slice(0,100)}...</div><div style="display:flex;gap:14px;margin-top:5px;font-size:11.5px;color:var(--g400)"><span>💬 ${p.rp}</span><span>❤️ ${p.lk}</span><span>${p.t}</span></div></div></div>`;
+  });
+  h+=`</div>`;
+  return h;
+}
+
+// PARCOURS
+function pgParcours(){
+  let h=`<div class="card card-dark" style="margin-bottom:20px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:20px;font-weight:700;margin-bottom:4px">Mon parcours entrepreneurial</div><div style="font-size:13.5px;opacity:0.6;font-weight:300">6 modules · 4h30 · Adapté à votre profil</div></div><div style="text-align:center"><div style="font-size:32px;font-weight:800">31%</div><div style="font-size:11.5px;opacity:0.5">complété</div></div></div><div class="prog prog-dark" style="margin-top:14px"><div class="prog-fill fill-grad" style="width:31%"></div></div></div>`;
+  MODS.forEach(m=>{
+    const op=expMod===m.id&&!m.locked;
+    h+=`<div class="mod${m.locked?' locked':''}" ${!m.locked?`onclick="togMod(${m.id})"`:''}>`;
+    h+=`<div class="mod-head"><div class="mod-ico" style="background:${m.locked?'var(--g100)':'linear-gradient(135deg,var(--teal-p),#D4F0EC)'}">${m.locked?'🔒':m.ic}</div><div style="flex:1"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700;color:${m.locked?'var(--g400)':'var(--navy)'};font-size:14.5px">Module ${m.id} : ${m.t}</div><span class="badge b-${m.b}">${m.bt}</span></div><div style="font-size:12.5px;color:var(--g400);margin-top:3px">${m.d}</div>`;
+    if(m.p>0){h+=`<div style="margin-top:9px"><div class="prog"><div class="prog-fill ${m.p===100?'fill-teal':'fill-gold'}" style="width:${m.p}%"></div></div><div style="font-size:11px;color:var(--g400);margin-top:3px">${m.p}% · ${m.dur}</div></div>`}
+    h+=`</div></div>`;
+    if(op){
+      const dn=m.p>50?2:m.p>0?1:0;
+      h+=`<div class="mod-detail open"><div class="mod-lessons">${["Leçon interactive","Quiz de validation","Cas pratique","Fiche mémo"].map((l,i)=>`<div class="mod-lesson${i<dn?' done':''}">${i<dn?'✅':'○'} ${l}</div>`).join('')}</div><button class="btn btn-sm btn-p" style="margin-top:10px" onclick="event.stopPropagation()">${m.p>0?'Continuer →':'Commencer →'}</button></div>`;
+    }
+    h+=`</div>`;
+  });
+  return h;
+}
+function togMod(id){expMod=expMod===id?null:id;renderPage()}
+
+// SIMULATEUR
+function pgSim(){
+  const r=simR,u=Math.round(r*(simS==='EI'?0.22:0.195)),c=Math.round(r*0.10),ir=Math.round((r-u-c)*(simS==='EI'?0.30:0.15)),net=r-u-c-ir,pct=Math.round(((r-net)/r)*100);
+  const tip=simS==='EI'?"En SELARL, vous pourriez optimiser vos cotisations via la répartition rémunération/dividendes. Voir le Module 1.":"La SELARL offre une flexibilité sur la répartition dividendes/rémunération. Attention au seuil de 10% du capital social.";
+  let h=`<div class="card card-dark" style="margin-bottom:20px"><div style="font-size:20px;font-weight:700;margin-bottom:4px">Simulateur fiscal simplifié</div><div style="font-size:13.5px;opacity:0.6;font-weight:300">Estimez vos charges et revenus. Résultats indicatifs.</div></div>`;
+  h+=`<div class="g2"><div class="card"><div class="sec-title">Paramètres</div>`;
+  h+=`<div style="margin-bottom:18px"><label class="sim-label">Revenu brut annuel</label><input type="range" min="40000" max="250000" step="5000" value="${r}" oninput="simR=+this.value;renderPage()"><div style="text-align:center;font-size:26px;font-weight:800;color:var(--navy);margin-top:6px">${r.toLocaleString('fr-FR')} €</div></div>`;
+  h+=`<div style="margin-bottom:18px"><label class="sim-label">Statut juridique</label><div class="tog"><button class="tog-btn${simS==='EI'?' on':''}" onclick="simS='EI';renderPage()">Entreprise Individuelle</button><button class="tog-btn${simS==='SELARL'?' on':''}" onclick="simS='SELARL';renderPage()">SELARL</button></div></div>`;
+  h+=`<label class="sim-label">Secteur conventionnel</label><div class="tog"><button class="tog-btn${simSec==='1'?' on':''}" onclick="simSec='1';renderPage()">Secteur 1</button><button class="tog-btn${simSec==='2'?' on':''}" onclick="simSec='2';renderPage()">Secteur 2</button></div></div>`;
+  
+  h+=`<div class="card"><div class="sec-title">Résultat</div>`;
+  h+=`<div class="sim-result"><div style="font-size:12.5px;opacity:0.6">Revenu net estimé</div><div style="font-size:34px;font-weight:800;margin-top:2px">${net.toLocaleString('fr-FR')} €</div><div style="font-size:13.5px;opacity:0.6;margin-top:2px">~${Math.round(net/12).toLocaleString('fr-FR')} € / mois</div></div>`;
+  h+=`<div style="margin-top:18px">`;
+  [{l:"URSSAF",v:u,c:"var(--coral)"},{l:"CARMF (retraite)",v:c,c:"var(--gold)"},{l:"IR estimé",v:ir,c:"var(--navy)"}].forEach(x=>{
+    h+=`<div class="sim-row"><div style="display:flex;align-items:center;gap:7px"><div class="sim-dot" style="background:${x.c}"></div><span style="font-size:13.5px;color:var(--g500)">${x.l}</span></div><span style="font-size:13.5px;font-weight:700">-${x.v.toLocaleString('fr-FR')} €</span></div>`;
+  });
+  h+=`<div style="border-top:1px solid var(--g200);padding-top:10px;display:flex;justify-content:space-between;margin-top:4px"><span style="font-size:12.5px;font-weight:600;color:var(--g400)">Taux de charges</span><span style="font-size:14.5px;font-weight:800;color:var(--coral)">${pct}%</span></div></div>`;
+  h+=`<div class="sim-tip">💡 <strong>Conseil :</strong> ${tip}</div></div></div>`;
+  return h;
+}
+
+// CHECKLIST
+function pgCheck(){
+  const dn=checks.filter(Boolean).length,pct=Math.round(dn/CHL.length*100);
+  let h=`<div class="card card-dark" style="margin-bottom:20px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:20px;font-weight:700;margin-bottom:4px">Checklist d'installation</div><div style="font-size:13.5px;opacity:0.6;font-weight:300">Les étapes pour ouvrir votre cabinet</div></div><div style="text-align:center"><div style="font-size:32px;font-weight:800">${dn}/${CHL.length}</div><div style="font-size:11.5px;opacity:0.5">complétées</div></div></div><div class="prog prog-dark" style="margin-top:14px"><div class="prog-fill fill-grad" style="width:${pct}%"></div></div></div>`;
+  h+=`<div class="card">`;
+  CHL.forEach((item,i)=>{const d=checks[i];h+=`<div class="chk${d?' done':''}" onclick="checks[${i}]=checks[${i}]?0:1;renderPage()"><div class="chk-circle${d?' done':''}">${d?'✓':''}</div><div style="flex:1;font-weight:${d?400:500}">${item.t}</div><span class="badge b-gray">${item.c}</span></div>`});
+  h+=`</div>`;
+  return h;
+}
+
+// COMMUNAUTÉ
+function pgComm(){
+  let h=`<div class="card card-dark" style="margin-bottom:20px"><div style="font-size:20px;font-weight:700;margin-bottom:4px">Communauté ePocrate</div><div style="font-size:13.5px;opacity:0.6;font-weight:300">Échangez avec des médecins qui partagent les mêmes défis</div></div>`;
+  h+=`<div class="pills">${["Tous","Installation","Fiscalité","Management","Patientèle"].map((t,i)=>`<button class="pill${i===0?' on':''}">${t}</button>`).join('')}</div>`;
+  POSTS.forEach(p=>{
+    h+=`<div class="card post"><div class="post-head"><div class="avatar">${p.ini}</div><div><div style="font-weight:700;color:var(--navy);font-size:13.5px">${p.a}</div><div style="font-size:12px;color:var(--g400)">${p.r} · ${p.t}</div></div></div><p style="font-size:13.5px;color:var(--g500);line-height:1.6">${p.txt}</p><div class="post-meta"><button>💬 ${p.rp} réponses</button><button>❤️ ${p.lk}</button><button>↗ Partager</button></div></div>`;
+  });
+  return h;
+}
+
+// RESSOURCES
+function pgRes(){
+  let h=`<div class="card card-dark" style="margin-bottom:20px"><div style="font-size:20px;font-weight:700;margin-bottom:4px">Ressources et outils</div><div style="font-size:13.5px;opacity:0.6;font-weight:300">Guides, templates et outils pour votre cabinet</div></div>`;
+  h+=`<div class="g3">`;
+  RES.forEach(r=>{h+=`<div class="card res">${r.tag?`<span class="badge b-${r.tc}">${r.tag}</span>`:''}<div style="font-size:30px;margin-bottom:10px">${r.ic}</div><div style="font-weight:700;color:var(--navy);font-size:13.5px;margin-bottom:4px;line-height:1.4">${r.t}</div><div style="font-size:12px;color:var(--g400);font-weight:500">${r.ty}</div></div>`});
+  h+=`</div>`;
+  return h;
+}
+
+// INIT
+renderNav();renderTb();renderPage();
+</script>
+</body>
+</html>
